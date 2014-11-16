@@ -35,7 +35,8 @@
 #define USE_VIEWPORT_LANDSCAPE 1   //0: viewport_portrait, 1: viewport_landscape
 
 //const gkString gkDefaultBlend   = "momo_ogre_i.blend";
-const gkString gkDefaultBlend   = "multitouch_test.blend";
+//const gkString gkDefaultBlend   = "multitouch_test.blend";
+const gkString gkDefaultBlend   = "momo_ogre.blend";
 const gkString gkDefaultConfig  = "OgreKitStartup.cfg";
 
 
