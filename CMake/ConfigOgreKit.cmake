@@ -318,7 +318,7 @@ macro (configure_ogrekit ROOT OGREPATH OGRE_BACKEND)
 		# Set build variables
 		set(CMAKE_OSX_SYSROOT iphoneos)
 		set(CMAKE_OSX_DEPLOYMENT_TARGET "")
-		set(CMAKE_EXE_LINKER_FLAGS "-framework Foundation -framework CoreGraphics -framework QuartzCore -framework UIKit")
+		set(CMAKE_EXE_LINKER_FLAGS "-framework Foundation -framework CoreGraphics -framework QuartzCore -framework UIKit -framework OpenGLES")
 		set(XCODE_ATTRIBUTE_SDKROOT iphoneos)
 		set(MACOSX_BUNDLE_GUI_IDENTIFIER "com.yourcompany.\${PRODUCT_NAME:rfc1034identifier}")
 		set(OGRE_CONFIG_ENABLE_VIEWPORT_ORIENTATIONMODE TRUE CACHE BOOL "Forcing viewport orientation support for iPhone" FORCE)
@@ -335,7 +335,6 @@ macro (configure_ogrekit ROOT OGREPATH OGRE_BACKEND)
 			endif()
 		endif()
 	
-		add_definitions(-fno-regmove)
 		remove_definitions(-msse)
 	
 		if (OGRE_CONFIG_ENABLE_VIEWPORT_ORIENTATIONMODE)
