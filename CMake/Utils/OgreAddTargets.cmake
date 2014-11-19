@@ -71,18 +71,34 @@ macro(create_unity_build_files TARGETNAME)
       get_filename_component(_EXT ${_FILE} EXT)
       list(FIND _EXCLUDES ${_FILE} _EXCLUDED)
       if ((_EXT STREQUAL ".cpp") AND (_EXCLUDED EQUAL "-1"))
-        set(_FILE_CONTENTS "${_FILE_CONTENTS}\#include \"${_FILE}\"\n")
-        math(EXPR _FILE_CNT "${_FILE_CNT}+1")
-        if(_FILE_CNT EQUAL OGRE_UNITY_FILES_PER_UNIT)
-          set(_FILENAME "${OGRE_BINARY_DIR}/${TARGETNAME}/compile_${TARGETNAME}_${_FILE_NUM}.cpp")
-          check_and_update_file(${_FILENAME} ${_FILE_CONTENTS})
-          math(EXPR _FILE_NUM "${_FILE_NUM}+1")
-          set(_FILE_CNT 0)
-          set (_FILE_CONTENTS "")
-          list(APPEND _SOURCES ${_FILENAME})
+        set(_OBJC FALSE)
+        if (APPLE)
+          # test if file imports Objective-C headers
+          file(READ ${_FILE} _CUR)
+          string(REGEX MATCH
+            "\n *# *import *[<\"][^>\"]*[>\"]"
+            _MATCH
+            ${_CUR}
+          )
+          if (NOT _MATCH STREQUAL "")
+            set(_OBJC TRUE)
+          endif()
         endif()
-        # exclude the original source file from the compilation
-        set_source_files_properties(${_FILE} PROPERTIES LANGUAGE "" HEADER_FILE_ONLY TRUE)
+        if (NOT _OBJC)
+          # add file only if it does not import Objetive-C headers
+          set(_FILE_CONTENTS "${_FILE_CONTENTS}\#include \"${_FILE}\"\n")
+          math(EXPR _FILE_CNT "${_FILE_CNT}+1")
+          if(_FILE_CNT EQUAL OGRE_UNITY_FILES_PER_UNIT)
+            set(_FILENAME "${OGRE_BINARY_DIR}/${TARGETNAME}/compile_${TARGETNAME}_${_FILE_NUM}.cpp")
+            check_and_update_file(${_FILENAME} ${_FILE_CONTENTS})
+            math(EXPR _FILE_NUM "${_FILE_NUM}+1")
+            set(_FILE_CNT 0)
+            set (_FILE_CONTENTS "")
+            list(APPEND _SOURCES ${_FILENAME})
+          endif()
+          # exclude the original source file from the compilation
+          set_source_files_properties(${_FILE} PROPERTIES LANGUAGE "" HEADER_FILE_ONLY TRUE)
+        endif()
       endif()
     endforeach()
     # don't forget the last set of files
