@@ -84,12 +84,15 @@ int iPhoneMultiTouch::TouchTracker::getFingerCount() const
 
 //-------------------------------------------------------------------//
 iPhoneMultiTouch::iPhoneMultiTouch( InputManager* creator, bool buffered )
-	: MultiTouch(creator->inputSystemName(), buffered, 0, creator)
+	: MultiTouch(creator->inputSystemName(), buffered, 0, creator), mScale(1.0)
 {
 	iPhoneInputManager *man = static_cast<iPhoneInputManager*>(mCreator);
 
     man->_setMultiTouchUsed(true);
     [man->_getDelegate() setTouchObject:this];
+	
+	if ([man->_getDelegate() respondsToSelector:@selector(contentScaleFactor)])
+		mScale = [[UIScreen mainScreen] scale];
 	
 	mStates.resize(OIS_MAX_NUM_TOUCHES);
 }
@@ -185,8 +188,8 @@ void iPhoneMultiTouch::_touchBegan(UITouch *touch)
 	
 	MultiTouchState& newState = mStates[fid];
 	
-    newState.X.abs = location.x;
-    newState.Y.abs = location.y;
+    newState.X.abs = mScale * location.x;
+    newState.Y.abs = mScale * location.y;
     newState.X.rel = 0;
     newState.Y.rel = 0;
     newState.touchType = MT_Pressed;
@@ -214,8 +217,8 @@ void iPhoneMultiTouch::_touchEnded(UITouch *touch)
 	
 	MultiTouchState& newState = mStates[fid];
 	
-	newState.X.abs = location.x;
-	newState.Y.abs = location.y;
+	newState.X.abs = mScale * location.x;
+	newState.Y.abs = mScale * location.y;
 	newState.X.rel = 0;
 	newState.Y.rel = 0;
 	newState.touchType = MT_Released;
@@ -246,10 +249,10 @@ void iPhoneMultiTouch::_touchMoved(UITouch *touch)
 		
 	MultiTouchState& newState = mStates[fid];
 	
-	newState.X.abs = location.x;
-	newState.Y.abs = location.y;
-	newState.X.rel = (location.x - previousLocation.x);
-	newState.Y.rel = (location.y - previousLocation.y);
+	newState.X.abs = mScale * location.x;
+	newState.Y.abs = mScale * location.y;
+	newState.X.rel = mScale * (location.x - previousLocation.x);
+	newState.Y.rel = mScale * (location.y - previousLocation.y);
 	newState.touchType = MT_Moved;
 	newState.fingerID = fid;
 	newState.tapCount = taps;
@@ -274,8 +277,8 @@ void iPhoneMultiTouch::_touchCancelled(UITouch *touch)
 	int taps = [touch tapCount];
 
     MultiTouchState& newState = mStates[fid];
-    newState.X.abs = location.x;
-    newState.Y.abs = location.y;
+    newState.X.abs = mScale * location.x;
+    newState.Y.abs = mScale * location.y;
     newState.touchType = MT_Cancelled;
 	newState.tapCount = taps;
 

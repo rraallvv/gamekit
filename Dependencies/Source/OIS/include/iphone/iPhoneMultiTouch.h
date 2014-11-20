@@ -85,6 +85,7 @@ namespace OIS
         
 	protected:
 		MultiTouchState mTempState;
+		CGFloat mScale;
 	};
 }
 
