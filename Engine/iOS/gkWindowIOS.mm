@@ -243,6 +243,9 @@ void gkWindowIOS::transformInputState(OIS::MultiTouchState& state)
 
 bool gkWindowIOS::touchPressed(const OIS::MultiTouchEvent& arg)
 {
+	// Place the mouse pointer at the touch position first
+	this->touchMoved(arg);
+	
 // untested patch by afterbeta
 // see: http://code.google.com/p/gamekit/issues/detail?id=264
 	{
@@ -318,7 +321,7 @@ bool gkWindowIOS::touchReleased(const OIS::MultiTouchEvent& arg)
 		gkWindowSystem::Listener* node = m_listeners.begin();
 		while (node)
 		{
-			node->mousePressed(m_mouse);
+			node->mouseReleased(m_mouse);
 			node->joystickReleased(data,0);
 			node = node->getNext();
 		}
