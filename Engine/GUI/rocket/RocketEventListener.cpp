@@ -32,6 +32,7 @@
 #include <Rocket/Debugger.h>
 #include "RocketRenderListener.h"
 
+static bool mouseState[3] = {false, false, false};
 
 RocketEventListener::RocketEventListener(gkWindow* window, Rocket::Core::Context* context)
 	:	m_context(context),
@@ -61,16 +62,22 @@ void RocketEventListener::mouseMoved(const gkMouse& mouse)
 
 void RocketEventListener::mousePressed(const gkMouse& mouse)
 {
-	for (int i = 0; i < 3; i++)
-		if (mouse.isButtonDown(i))
+	for (int i = 0; i < 3; i++) {
+		if (mouseState[i] != mouse.isButtonDown(i)) {
 			m_context->ProcessMouseButtonDown(i, getKeyModifierState(m_window->getKeyModifier()));
+			mouseState[i] = mouse.isButtonDown(i);
+		}
+	}
 }
 
 void RocketEventListener::mouseReleased(const gkMouse& mouse)
 {
-	for (int i = 0; i < 3; i++)
-		if (!mouse.isButtonDown(i))
+	for (int i = 0; i < 3; i++) {
+		if (mouseState[i] != mouse.isButtonDown(i)) {
 			m_context->ProcessMouseButtonUp(i, getKeyModifierState(m_window->getKeyModifier()));
+			mouseState[i] = mouse.isButtonDown(i);
+		}
+	}
 }
 
 
