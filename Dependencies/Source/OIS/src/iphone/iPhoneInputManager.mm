@@ -43,9 +43,22 @@ using namespace OIS;
     return self;
 }
 
+- (id)initWithFrame:(CGRect)frame {
+    if((self = [super initWithFrame:frame])) {
+        [[UIDevice currentDevice] beginGeneratingDeviceOrientationNotifications];
+        [[NSNotificationCenter defaultCenter] addObserver:self
+                                                 selector:@selector(orientationChanged:)
+                                                     name:UIDeviceOrientationDidChangeNotification
+                                                   object:nil];
+    }
+    return self;
+}
+
 - (void)dealloc {
     delete touchObject; touchObject = NULL;
     delete accelerometerObject; accelerometerObject = NULL;
+
+    [[NSNotificationCenter defaultCenter] removeObserver:self name:UIDeviceOrientationDidChangeNotification object:nil];
 
     [super dealloc];
 }
@@ -82,6 +95,44 @@ using namespace OIS;
 - (void)touchesBegan:(NSSet *)touches withEvent:(UIEvent *)event {
     for(UITouch *touch in touches) {
         touchObject->_touchBegan(touch);
+    }
+}
+
+- (void)orientationChanged:(NSNotification *)notification {
+    // Check for orientation dependant view bounds.  iOS 8 or later
+    CGFloat mCurrentOSVersion = [[[UIDevice currentDevice] systemVersion] floatValue];
+
+    if (mCurrentOSVersion < 8.0) {
+        // Rotate the view so that the touch coordinates are also rotated to match the current orientation
+        UIDeviceOrientation deviceOrientation = [[UIApplication sharedApplication] statusBarOrientation];
+        CGRect rect = [[UIScreen mainScreen] bounds];
+
+        rect = CGRectMake(0, 0, rect.size.height, rect.size.width);
+
+        switch (deviceOrientation) {
+            case UIDeviceOrientationPortrait:
+                self.transform = CGAffineTransformMakeRotation(0);
+                self.bounds = [[UIScreen mainScreen] bounds];
+                break;
+
+            case UIDeviceOrientationPortraitUpsideDown:
+                self.transform = CGAffineTransformMakeRotation(-M_PI);
+                self.bounds = [[UIScreen mainScreen] bounds];
+                break;
+
+            case UIDeviceOrientationLandscapeLeft:
+                self.transform = CGAffineTransformMakeRotation(M_PI_2);
+                self.bounds = rect;
+                break;
+
+            case UIDeviceOrientationLandscapeRight:
+                self.transform = CGAffineTransformMakeRotation(-M_PI_2);
+                self.bounds = rect;
+                break;
+
+            default:
+                break;
+        }
     }
 }
 
