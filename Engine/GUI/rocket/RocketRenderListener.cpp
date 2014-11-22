@@ -59,6 +59,7 @@ void RocketRenderListener::postRenderTargetUpdate(const Ogre::RenderTargetEvent 
 {
 	if (Ogre::Root::getSingleton().getRenderSystem()->_getViewport()->getOverlaysEnabled())
 	{
+		m_context->SetDimensions(Rocket::Core::Vector2i(m_window->getWidth(), m_window->getHeight()));
 		m_context->Update();
 
 		ConfigureRenderSystem();
