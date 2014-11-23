@@ -60,14 +60,13 @@ using namespace Ogre;
     // Change the viewport orientation based upon the current device orientation.
     // Note: This only operates on the main viewport, usually the main view.
 
-    // This always gets the right orientation
+//	This always gets the right orientation
     UIDeviceOrientation deviceOrientation = [[UIApplication sharedApplication] statusBarOrientation];
 
-    // This fails to get a valid orientation sometimes when lauching the application
-    //[[UIDevice currentDevice] beginGeneratingDeviceOrientationNotifications];
-    //
-    //if(!UIDeviceOrientationIsValidInterfaceOrientation(deviceOrientation))
-    //     return;
+//	This fails to get a valid orientation sometimes when lauching the application
+//	[[UIDevice currentDevice] beginGeneratingDeviceOrientationNotifications];
+//	if(!UIDeviceOrientationIsValidInterfaceOrientation(deviceOrientation))
+//		return;
 
     // Check if orientation is supported
     NSString *rotateToOrientation = @"";
