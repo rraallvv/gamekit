@@ -76,6 +76,13 @@ RenderInterfaceOgre3D::RenderInterfaceOgre3D(unsigned int window_width, unsigned
 	scissor_top = 0;
 	scissor_right = (int) window_width;
 	scissor_bottom = (int) window_height;
+
+#if OGRE_PLATFORM == OGRE_PLATFORM_APPLE_IOS || OGRE_PLATFORM == OGRE_PLATFORM_ANDROID
+	mWindowWidth = window_width;
+	mWindowHeight = window_height;
+	
+	CreateShaders();
+#endif
 }
 
 RenderInterfaceOgre3D::~RenderInterfaceOgre3D()
@@ -172,6 +179,16 @@ void RenderInterfaceOgre3D::RenderCompiledGeometry(Rocket::Core::CompiledGeometr
 	Ogre::Matrix4 transform;
 	transform.makeTrans(translation.x, translation.y, 0);
 	render_system->_setWorldMatrix(transform);
+	
+#if OGRE_PLATFORM == OGRE_PLATFORM_APPLE_IOS || OGRE_PLATFORM == OGRE_PLATFORM_ANDROID
+	bool hasGLES2 = Ogre::GpuProgramManager::getSingleton().isSyntaxSupported("glsles");
+	if (hasGLES2)
+	{
+		Ogre::Matrix4 projection_matrix;
+		BuildProjectionMatrix(projection_matrix);
+		mVertexProgramParams->setNamedConstant("modelViewProj", projection_matrix * transform);
+	}
+#endif
 
 	render_system = Ogre::Root::getSingleton().getRenderSystem();
 	RocketOgre3DCompiledGeometry* ogre3d_geometry = (RocketOgre3DCompiledGeometry*) geometry;
@@ -184,9 +201,30 @@ void RenderInterfaceOgre3D::RenderCompiledGeometry(Rocket::Core::CompiledGeometr
 		// we need to re-specify them.
 		render_system->_setTextureBlendMode(0, colour_blend_mode);
 		render_system->_setTextureBlendMode(0, alpha_blend_mode);
+		
+#if OGRE_PLATFORM == OGRE_PLATFORM_APPLE_IOS || OGRE_PLATFORM == OGRE_PLATFORM_ANDROID
+		if (hasGLES2)
+			mFragmentProgramParams->setNamedConstant("u_hasTexture", 1);
+#endif
 	}
 	else
+	{
 		render_system->_disableTextureUnit(0);
+#if OGRE_PLATFORM == OGRE_PLATFORM_APPLE_IOS || OGRE_PLATFORM == OGRE_PLATFORM_ANDROID
+		if (hasGLES2)
+			mFragmentProgramParams->setNamedConstant("u_hasTexture", 0);
+#endif
+	}
+	
+#if OGRE_PLATFORM == OGRE_PLATFORM_APPLE_IOS || OGRE_PLATFORM == OGRE_PLATFORM_ANDROID
+	if (hasGLES2) {
+		render_system->bindGpuProgram( mVertexProgram->_getBindingDelegate() );
+		render_system->bindGpuProgram( mFragmentProgram->_getBindingDelegate() );
+		
+		render_system->bindGpuProgramParameters(Ogre::GPT_VERTEX_PROGRAM, mVertexProgramParams, Ogre::GPV_ALL);
+		render_system->bindGpuProgramParameters(Ogre::GPT_FRAGMENT_PROGRAM, mFragmentProgramParams, Ogre::GPV_ALL);
+	}
+#endif
 
 	render_system->_render(ogre3d_geometry->render_operation);
 }
@@ -298,3 +336,67 @@ float RenderInterfaceOgre3D::GetVerticalTexelOffset()
 {
 	return -render_system->getVerticalTexelOffset();
 }
+
+#if OGRE_PLATFORM == OGRE_PLATFORM_APPLE_IOS || OGRE_PLATFORM == OGRE_PLATFORM_ANDROID
+void RenderInterfaceOgre3D::CreateShaders()
+{
+	if (Ogre::GpuProgramManager::getSingleton().isSyntaxSupported("glsles"))
+	{
+		mVertexProgram = Ogre::HighLevelGpuProgramManager::getSingleton().createProgram("SimpleTexturingNoLightsVP",
+		Ogre::ResourceGroupManager::DEFAULT_RESOURCE_GROUP_NAME, "glsles", Ogre::GPT_VERTEX_PROGRAM);
+		mVertexProgram->setSource(
+			"precision mediump float;\n"
+			"varying vec2 v_texCoord;\n"
+			"varying vec4 v_colour;\n"
+			"attribute vec4 vertex;\n"
+			"attribute vec4 colour;\n"
+			"attribute vec4 uv0;\n"
+			"uniform mat4 modelViewProj;\n\n"
+			"void main()\n"
+			"{\n"
+			"	// Transforming The Vertex\n"
+			"	gl_Position = modelViewProj * vertex;\n\n"
+			"	// Passing The Texture Coordinate Of Texture Unit 0 To The Fragment Shader\n"
+			"	v_texCoord = vec2(uv0);\n"
+			"	v_colour = colour;\n"
+			"}");
+		mVertexProgram->load();
+		mVertexProgramParams = mVertexProgram->createParameters();
+		
+		mFragmentProgram = Ogre::HighLevelGpuProgramManager::getSingleton().createProgram("SimpleTexturingNoLightsFP",
+		Ogre::ResourceGroupManager::DEFAULT_RESOURCE_GROUP_NAME, "glsles", Ogre::GPT_FRAGMENT_PROGRAM);
+		mFragmentProgram->setSource(
+			"precision mediump float;\n"
+			"varying vec2 v_texCoord;\n"
+			"varying vec4 v_colour;\n"
+			"uniform sampler2D s_texture;\n\n"
+			"uniform int u_hasTexture;\n\n"
+			"void main()\n"
+			"{\n"
+			"	if (u_hasTexture == 1)\n"
+			"		gl_FragColor = texture2D(s_texture, v_texCoord) * v_colour;\n"
+			"	else\n"
+			"		gl_FragColor = v_colour;\n"
+			"}");
+		mFragmentProgram->load();
+		mFragmentProgramParams = mFragmentProgram->createParameters();
+	}
+}
+
+// Builds an OpenGL-style orthographic projection matrix.
+void RenderInterfaceOgre3D::BuildProjectionMatrix(Ogre::Matrix4& projection_matrix)
+{
+	float z_near = -1;
+	float z_far = 1;
+	
+	projection_matrix = Ogre::Matrix4::ZERO;
+	
+	// Set up matrices.
+	projection_matrix[0][0] = 2.0f / (float) mWindowWidth;
+	projection_matrix[0][3]= -1.0000000f;
+	projection_matrix[1][1]= -2.0f / (float) mWindowHeight;
+	projection_matrix[1][3]= 1.0000000f;
+	projection_matrix[2][2]= -2.0f / (z_far - z_near);
+	projection_matrix[3][3]= 1.0000000f;
+}
+#endif

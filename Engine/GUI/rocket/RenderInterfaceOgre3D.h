@@ -82,6 +82,18 @@ class RenderInterfaceOgre3D : public Rocket::Core::RenderInterface
 		int scissor_top;
 		int scissor_right;
 		int scissor_bottom;
+
+#if OGRE_PLATFORM == OGRE_PLATFORM_APPLE_IOS || OGRE_PLATFORM == OGRE_PLATFORM_ANDROID
+		void CreateShaders();
+		void BuildProjectionMatrix(Ogre::Matrix4& projection_matrix);
+
+		int mWindowWidth, mWindowHeight;
+	
+		Ogre::HighLevelGpuProgramPtr		mVertexProgram;
+		Ogre::HighLevelGpuProgramPtr		mFragmentProgram;
+		Ogre::GpuProgramParametersSharedPtr mVertexProgramParams;
+		Ogre::GpuProgramParametersSharedPtr mFragmentProgramParams;
+#endif
 };
 
 #endif
