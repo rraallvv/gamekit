@@ -143,13 +143,23 @@ Rocket::Core::CompiledGeometryHandle RenderInterfaceOgre3D::CompileGeometry(Rock
 
 
 	// Create the index buffer.
+#if OGRE_PLATFORM == OGRE_PLATFORM_APPLE_IOS || OGRE_PLATFORM == OGRE_PLATFORM_ANDROID
+	Ogre::HardwareIndexBufferSharedPtr index_buffer = Ogre::HardwareBufferManager::getSingleton().createIndexBuffer(Ogre::HardwareIndexBuffer::IT_16BIT, num_indices, Ogre::HardwareBuffer::HBU_STATIC_WRITE_ONLY);
+#else
 	Ogre::HardwareIndexBufferSharedPtr index_buffer = Ogre::HardwareBufferManager::getSingleton().createIndexBuffer(Ogre::HardwareIndexBuffer::IT_32BIT, num_indices, Ogre::HardwareBuffer::HBU_STATIC_WRITE_ONLY);
+#endif
 	geometry->render_operation.indexData->indexBuffer = index_buffer;
 	geometry->render_operation.useIndexes = true;
 
 	// Fill the index buffer.
+#if OGRE_PLATFORM == OGRE_PLATFORM_APPLE_IOS || OGRE_PLATFORM == OGRE_PLATFORM_ANDROID
+	short* ogre_indices = (short*)index_buffer->lock(0, index_buffer->getSizeInBytes(), Ogre::HardwareBuffer::HBL_NORMAL);
+	for (int i = 0; i < num_indices; ++i)
+		ogre_indices[i] = indices[i];
+#else
 	void* ogre_indices = index_buffer->lock(0, index_buffer->getSizeInBytes(), Ogre::HardwareBuffer::HBL_NORMAL);
 	memcpy(ogre_indices, indices, sizeof(unsigned int) * num_indices);
+#endif
 	index_buffer->unlock();
 
 
@@ -223,7 +233,13 @@ bool RenderInterfaceOgre3D::LoadTexture(Rocket::Core::TextureHandle& texture_han
 		ogre_texture = texture_manager->load(Ogre::String(source.CString()),
 							DEFAULT_ROCKET_RESOURCE_GROUP,
 							Ogre::TEX_TYPE_2D,
+#if OGRE_PLATFORM == OGRE_PLATFORM_APPLE_IOS || OGRE_PLATFORM == OGRE_PLATFORM_ANDROID
+							// Unless you'r sure that Ogre is not going to resize the texture, it's better to have mipmaps.
+							// See issue 336 (https://ogre3d.atlassian.net/browse/OGRE-336)
+							Ogre::MIP_DEFAULT);
+#else
 							0);
+#endif
 	}
 
 	if (ogre_texture.isNull())
@@ -250,7 +266,13 @@ bool RenderInterfaceOgre3D::GenerateTexture(Rocket::Core::TextureHandle& texture
 										(Ogre::ushort)source_dimensions.y,
 										Ogre::PF_A8B8G8R8,
 										Ogre::TEX_TYPE_2D,
+#if OGRE_PLATFORM == OGRE_PLATFORM_APPLE_IOS || OGRE_PLATFORM == OGRE_PLATFORM_ANDROID
+										// Unless you'r sure that Ogre is not going to resize the texture, it's better to have mipmaps.
+										// See issue 336 (https://ogre3d.atlassian.net/browse/OGRE-336)
+										Ogre::MIP_DEFAULT);
+#else
 										0);
+#endif
 
 	if (ogre_texture.isNull())
 		return false;
