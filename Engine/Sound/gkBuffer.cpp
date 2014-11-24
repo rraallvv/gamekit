@@ -257,8 +257,11 @@ void gkBuffer::finalize(void)
 		return;
 
 	reset();
+
+	alSourcei(m_source,  AL_BUFFER, 0);			// Detach all the buffers from the source first, otherwise alDeleteBuffers fails with error "invalid operation"
 	alDeleteBuffers(GK_SND_SAMPLES, m_buffer);
 	alErrorThrow("closing buffers");
+
 	alDeleteSources(1, &m_source);
 	alErrorThrow("closing sources");
 }
