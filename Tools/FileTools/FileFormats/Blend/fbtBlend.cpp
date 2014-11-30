@@ -78,7 +78,7 @@ extern int bfBlenderLen;
 
 
 fbtBlend::fbtBlend()
-	:   fbtFile("BLENDER"), m_stripList(0)
+	:   fbtFile("BLENDER"), m_stripList(0), m_fg(0)
 {
 	m_aluhid = "BLENDEs"; //a stripped blend file
 }
