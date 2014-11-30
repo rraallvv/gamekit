@@ -99,14 +99,63 @@ using namespace OIS;
 }
 
 - (void)orientationChanged:(NSNotification *)notification {
-    // Check for orientation dependant view bounds.  iOS 8 or later
+
+    UIDeviceOrientation deviceOrientation = [[UIApplication sharedApplication] statusBarOrientation];
     CGFloat mCurrentOSVersion = [[[UIDevice currentDevice] systemVersion] floatValue];
 
-    if (mCurrentOSVersion < 8.0) {
-        // Rotate the view so that the touch coordinates are also rotated to match the current orientation
-        UIDeviceOrientation deviceOrientation = [[UIApplication sharedApplication] statusBarOrientation];
-        CGRect rect = [[UIScreen mainScreen] bounds];
+    if (mCurrentOSVersion >= 8.0) {
+        /* The system rotates the view, but we need to resize it and compensate for the origen displacement
+        +-->----           +-->
+        |       |          |
+        V       |        --V------------
+        |       |       |               |
+        |   o   |   =>  |       o       |
+        |       |       |               |
+        |       |        ---------------
+        |       |
+         -------
+        */
 
+        float offset;
+        CGRect rect = [[UIScreen mainScreen] bounds];
+        if (rect.size.width > rect.size.height)
+            // We need to make the rect protrait-oriented since this view was created in that way
+            rect = CGRectMake(0, 0, rect.size.height, rect.size.width);
+
+        switch (deviceOrientation) {
+            case UIDeviceOrientationPortrait:
+            case UIDeviceOrientationPortraitUpsideDown:
+                self.transform = CGAffineTransformMakeTranslation(0, 0);
+                self.bounds = rect;
+                break;
+
+            case UIDeviceOrientationLandscapeLeft:
+            case UIDeviceOrientationLandscapeRight:
+                offset = (rect.size.height-rect.size.width)/2;
+                self.transform = CGAffineTransformMakeTranslation(offset, -offset);
+                rect = CGRectMake(0, 0, rect.size.height, rect.size.width);
+                self.bounds = rect;
+                break;
+
+           default:
+                break;
+        }
+    }
+    else {
+        /* The system does not rotate the view, we need to rotate it and resize the rect.
+           The origin doesn't move from the top-left corner, so we needn't to add any offset
+        +-->----
+        |       |
+        V       |       +-->------------
+        |       |       |               |
+        |   o   |   =>  V       o       |
+        |       |       |               |
+        |       |        ---------------
+        |       |
+		 -------
+        */
+
+        CGRect rect = [[UIScreen mainScreen] bounds];
         rect = CGRectMake(0, 0, rect.size.height, rect.size.width);
 
         switch (deviceOrientation) {
@@ -159,9 +208,12 @@ iPhoneInputManager::~iPhoneInputManager()
 void iPhoneInputManager::_initialize( ParamList &paramList )
 {
 	_parseConfigSettings( paramList );
-    
-    mDelegate = [[InputDelegate alloc] initWithFrame:[[UIScreen mainScreen] bounds]];
-    
+    CGRect rect = [[UIScreen mainScreen] bounds];
+    if (rect.size.width > rect.size.height)
+        // Create the rect in portrait orientation to keep backwards compativility with iOS prior to 8
+        rect = CGRectMake(0, 0, rect.size.height, rect.size.width);
+    mDelegate = [[InputDelegate alloc] initWithFrame:rect];
+
     // Set flags that we want to accept multiple finger touches and be the only one to receive touch events
     [mDelegate setMultipleTouchEnabled:YES];
     [mDelegate setExclusiveTouch:YES];
