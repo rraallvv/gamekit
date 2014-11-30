@@ -123,6 +123,8 @@ void Context::SetDimensions(const Vector2i& _dimensions)
 		}
 		
 		clip_dimensions = dimensions;
+
+		render_interface->SetDimensions(_dimensions.x, _dimensions.y);
 	}
 }
 

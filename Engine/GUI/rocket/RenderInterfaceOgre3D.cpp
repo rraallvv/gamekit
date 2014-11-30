@@ -337,6 +337,13 @@ float RenderInterfaceOgre3D::GetVerticalTexelOffset()
 	return -render_system->getVerticalTexelOffset();
 }
 
+// Called by Rocket when the context dimensions changed.
+void RenderInterfaceOgre3D::SetDimensions(unsigned int window_width, unsigned int window_height)
+{
+	mWindowWidth = window_width;
+	mWindowHeight = window_height;
+}
+
 #if OGRE_PLATFORM == OGRE_PLATFORM_APPLE_IOS || OGRE_PLATFORM == OGRE_PLATFORM_ANDROID
 void RenderInterfaceOgre3D::CreateShaders()
 {

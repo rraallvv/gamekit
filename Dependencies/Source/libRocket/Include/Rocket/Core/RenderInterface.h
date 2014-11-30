@@ -115,6 +115,11 @@ public:
 	/// Called when this render interface is released.
 	virtual void Release();
 
+	/// Called by Rocket when the context dimensions changed.
+	/// @param[in] window_width The dimensions width.
+	/// @param[in] window_height The dimensions height.
+	virtual void SetDimensions(unsigned int window_width, unsigned int window_height);
+
 	/// Get the context currently being rendered. This is only valid during RenderGeometry,
 	/// CompileGeometry, RenderCompiledGeometry, EnableScissorRegion and SetScissorRegion.
 	Context* GetContext() const;

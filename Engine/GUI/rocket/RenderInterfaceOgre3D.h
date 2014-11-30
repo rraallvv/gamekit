@@ -71,6 +71,9 @@ class RenderInterfaceOgre3D : public Rocket::Core::RenderInterface
 		/// Returns the native vertical texel offset for the renderer.
 		float GetVerticalTexelOffset();
 
+		/// Called by Rocket when the context dimensions changed.
+		virtual void SetDimensions(unsigned int window_width, unsigned int window_height);
+
 	private:
 		Ogre::RenderSystem* render_system;
 

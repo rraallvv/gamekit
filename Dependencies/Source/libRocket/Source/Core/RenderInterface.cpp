@@ -97,6 +97,11 @@ void RenderInterface::OnReferenceDeactivate()
 	Release();
 }
 
+// Called by Rocket when the context dimensions changed.
+void RenderInterface::SetDimensions(unsigned int window_width, unsigned int window_height)
+{
+}
+
 // Get the context currently being rendered.
 Context* RenderInterface::GetContext() const
 {
