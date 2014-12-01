@@ -50,7 +50,7 @@ void gkLight::updateProperties(void)
 	m_light->setCastShadows(m_lightProps.m_casts);
 	m_light->setSpecularColour(m_lightProps.m_specular);
 	m_light->setSpecularColour(m_lightProps.m_specular);
-	m_light->setDiffuseColour(m_lightProps.m_diffuse * m_lightProps.m_power);
+	m_light->setDiffuseColour(m_lightProps.m_diffuse);
 	m_light->setAttenuation(m_lightProps.m_range, m_lightProps.m_constant, m_lightProps.m_linear, m_lightProps.m_quadratic);
 
 	m_light->setPowerScale(m_lightProps.m_power);

@@ -824,15 +824,15 @@ void gkBlenderSceneConverter::convertObjectLamp(gkGameObject* gobj, Blender::Obj
 	gkLightProperties& props = obj->getLightProperties();
 	Blender::Lamp* la = static_cast<Blender::Lamp*>(bobj->data);
 
-	props.m_diffuse = gkColor(la->r, la->g, la->b);
+	props.m_diffuse = gkColor(la->r, la->g, la->b)*powf(la->energy, 1.0/1.8);
 	if (la->mode & LA_NO_DIFF)
 		props.m_diffuse = gkColor::Black;
 
-	props.m_specular = gkColor(la->r, la->g, la->b);
+	props.m_specular = gkColor(la->r, la->g, la->b)*powf(la->energy, 1.0/3.4);
 	if (la->mode & LA_NO_SPEC)
 		props.m_specular = gkColor::Black;
 
-	props.m_power = la->energy;
+	props.m_power = 1.0;//la->energy;
 	if (la->mode & LA_NEG)
 		props.m_power = -props.m_power;
 
