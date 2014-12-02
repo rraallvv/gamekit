@@ -224,6 +224,9 @@ void gkActionActuator::update(void)
 	bool end = t >= m_end;
 	bool off = isPulseOff();
 
+	if (gkVariable *var = m_object->getVariable(m_startProp))
+		var->setValue(t*m_animFps);
+
 	if (off)
 		m_ignorePulseOn = false;
 
