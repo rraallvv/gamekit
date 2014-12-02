@@ -710,7 +710,7 @@ void gsEngine::unloadBlendFile(const gkString& name)
 		if (!m_engine->isInitialized())
 			gkLogMessage("gsEngine: unloadBlendFile on uninitialized engine.");
 
-		gkBlendLoader::getSingleton().unloadFile(name);
+		gkBlendLoader::getSingleton().unloadFile(gkUtils::getFile(name));
 	}
 }
 
