@@ -71,8 +71,10 @@ class RenderInterfaceOgre3D : public Rocket::Core::RenderInterface
 		/// Returns the native vertical texel offset for the renderer.
 		float GetVerticalTexelOffset();
 
+#if OGRE_PLATFORM == OGRE_PLATFORM_APPLE_IOS || OGRE_PLATFORM == OGRE_PLATFORM_ANDROID
 		/// Called by Rocket when the context dimensions changed.
 		virtual void SetDimensions(unsigned int window_width, unsigned int window_height);
+#endif
 
 	private:
 		Ogre::RenderSystem* render_system;
@@ -91,7 +93,7 @@ class RenderInterfaceOgre3D : public Rocket::Core::RenderInterface
 		void BuildProjectionMatrix(Ogre::Matrix4& projection_matrix);
 
 		int mWindowWidth, mWindowHeight;
-	
+
 		Ogre::HighLevelGpuProgramPtr		mVertexProgram;
 		Ogre::HighLevelGpuProgramPtr		mFragmentProgram;
 		Ogre::GpuProgramParametersSharedPtr mVertexProgramParams;

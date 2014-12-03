@@ -34,6 +34,7 @@
 #include "gkAnimationManager.h"
 #include "gkLogicManager.h"
 #include "gkLogicLink.h"
+#include "gkVariable.h"
 
 //#define DEBUG_PRINT printf
 #define DEBUG_PRINT(...)
