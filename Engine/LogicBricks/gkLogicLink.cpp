@@ -132,6 +132,10 @@ gkLogicLink* gkLogicLink::clone(gkGameObject* dest)
 			link->push(nsens);
 		}
 	}
+
+	// Attach the the newly created logic to the destination object
+	link->m_object->attachLogic(link);
+
 	return link;
 }
 
