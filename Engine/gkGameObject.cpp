@@ -114,7 +114,11 @@ void gkGameObject::attachLogic(gkLogicTree* tree)
 
 void gkGameObject::attachLogic(gkLogicLink* bricks)
 {
-	UT_ASSERT(!m_bricks);
+	UT_ASSERT(bricks && bricks != m_bricks);
+
+	if (m_bricks)
+		m_bricks->getLogicManager()->destroy(m_bricks);
+
 	m_bricks = bricks;
 }
 
