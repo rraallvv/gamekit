@@ -809,9 +809,50 @@ void gkBlenderSceneConverter::convertObjectCamera(gkGameObject* gobj, Blender::O
 		props.m_type    = gkCameraProperties::CA_PERSPECTIVE;
 	props.m_clipend     = camera->clipend;
 	props.m_clipstart   = camera->clipsta;
-	props.m_fov         = gkScalar(360) * gkMath::ATan(gkScalar(16) / camera->lens).valueRadians() / gkPi;
+	//props.m_fov         = gkScalar(360) * gkMath::ATan(gkScalar(16) / camera->lens).valueRadians() / gkPi;
 	props.m_orthoscale  = camera->ortho_scale;
 	props.m_start       = m_bscene->camera == bobj;
+
+	// Calculate the fov taking into account the camera sensor and render resolution to match the appearance of the camera viewport in blender
+	float rscr = (float)m_bscene->r.ysch/(float)m_bscene->r.xsch;
+	if (m_bscene->r.xsch < m_bscene->r.ysch)
+	{
+		switch (camera->sensor_fit) {
+			// Vertical
+			case 2:	//CAMERA_SENSOR_FIT_VERT
+				props.m_fov = gkScalar(360) * gkMath::ATan(gkScalar(0.5) * camera->sensor_y/camera->lens / rscr).valueRadians() / gkPi;
+				break;
+
+			// Horizontal
+			case 1:	//CAMERA_SENSOR_FIT_HOR
+				props.m_fov = gkScalar(360) * gkMath::ATan(gkScalar(0.5) * camera->sensor_x/camera->lens).valueRadians() / gkPi;
+				break;
+
+			// Auto
+			default://CAMERA_SENSOR_FIT_AUTO
+				props.m_fov = gkScalar(360) * gkMath::ATan(gkScalar(0.5) * camera->sensor_x/camera->lens / rscr).valueRadians() / gkPi;
+				break;
+		}
+	}
+	else
+	{
+		switch (camera->sensor_fit) {
+			// Vertical
+			case 2:	//CAMERA_SENSOR_FIT_VERT
+				props.m_fov = gkScalar(360) * gkMath::ATan(gkScalar(0.5) * camera->sensor_y/camera->lens * rscr).valueRadians() / gkPi;
+				break;
+
+			// Horizontal
+			case 1:	//CAMERA_SENSOR_FIT_HOR
+				props.m_fov = gkScalar(360) * gkMath::ATan(gkScalar(0.5) * camera->sensor_x/camera->lens * rscr * rscr).valueRadians() / gkPi;
+				break;
+
+			// Auto
+			default://CAMERA_SENSOR_FIT_AUTO
+				props.m_fov = gkScalar(360) * gkMath::ATan(gkScalar(0.5) * camera->sensor_x/camera->lens * rscr * rscr).valueRadians() / gkPi;
+				break;
+		}
+	}
 }
 
 
