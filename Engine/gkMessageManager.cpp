@@ -42,7 +42,7 @@ void gkMessageManager::GenericMessageListener::handleMessage(gkMessageManager::M
 {
 	if (!m_fromFilter.empty() && m_fromFilter.compare(message->m_from) != 0) return;
 	if ((!m_toFilter.empty() && m_toFilter.compare(message->m_to) != 0)
-			&& (m_acceptEmptyTo && !message->m_to.empty())) return;
+			&& !(m_acceptEmptyTo && message->m_to.empty())) return;
 	if (!m_subjectFilter.empty() && m_subjectFilter.compare(message->m_subject) != 0) return;
 
 	Message m = *message;
