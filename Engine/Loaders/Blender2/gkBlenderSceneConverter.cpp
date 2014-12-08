@@ -809,50 +809,52 @@ void gkBlenderSceneConverter::convertObjectCamera(gkGameObject* gobj, Blender::O
 		props.m_type    = gkCameraProperties::CA_PERSPECTIVE;
 	props.m_clipend     = camera->clipend;
 	props.m_clipstart   = camera->clipsta;
-	//props.m_fov         = gkScalar(360) * gkMath::ATan(gkScalar(16) / camera->lens).valueRadians() / gkPi;
 	props.m_orthoscale  = camera->ortho_scale;
 	props.m_start       = m_bscene->camera == bobj;
 
-	// Calculate the fov taking into account the camera sensor and render resolution to match the appearance of the camera viewport in blender
-	float rscr = (float)m_bscene->r.ysch/(float)m_bscene->r.xsch;
-	if (m_bscene->r.xsch < m_bscene->r.ysch)
+
+	// Calculate the fov to fit the camera viwport entirely inside the scene's display window.
+
+	gkScalar w = m_gscene->getDisplayWindow()->getWidth();
+	gkScalar h = m_gscene->getDisplayWindow()->getHeight();
+	gkScalar rscr = w/h;	// display window aspect ratio
+
+	gkScalar rw = gkScalar(m_bscene->r.xsch);
+	gkScalar rh = gkScalar(m_bscene->r.ysch);
+	gkScalar rren = rw/rh;	// aspect ratio of the blender render dimensions (aka resolution in Blender's render properties)
+
+	gkScalar senx = camera->sensor_x;
+	gkScalar seny = camera->sensor_y;
+	gkScalar sen;
+
+	switch (camera->sensor_fit)
 	{
-		switch (camera->sensor_fit) {
-			// Vertical
-			case 2:	//CAMERA_SENSOR_FIT_VERT
-				props.m_fov = gkScalar(360) * gkMath::ATan(gkScalar(0.5) * camera->sensor_y/camera->lens / rscr).valueRadians() / gkPi;
-				break;
+	case 2:	//CAMERA_SENSOR_FIT_VERT
+		if (rren < rscr) sen = seny * rscr;
+		else sen = seny * rren;
+		break;
 
-			// Horizontal
-			case 1:	//CAMERA_SENSOR_FIT_HOR
-				props.m_fov = gkScalar(360) * gkMath::ATan(gkScalar(0.5) * camera->sensor_x/camera->lens).valueRadians() / gkPi;
-				break;
+	case 1:	//CAMERA_SENSOR_FIT_HOR
+		if (rren < rscr) sen = senx / rren * rscr;
+		else sen = senx;
+		break;
 
-			// Auto
-			default://CAMERA_SENSOR_FIT_AUTO
-				props.m_fov = gkScalar(360) * gkMath::ATan(gkScalar(0.5) * camera->sensor_x/camera->lens / rscr).valueRadians() / gkPi;
-				break;
+	default://CAMERA_SENSOR_FIT_AUTO
+		if (rren < 1.0)
+		{
+			if (rren < rscr) sen = senx * rscr;
+			else sen = senx * rren;
 		}
-	}
-	else
-	{
-		switch (camera->sensor_fit) {
-			// Vertical
-			case 2:	//CAMERA_SENSOR_FIT_VERT
-				props.m_fov = gkScalar(360) * gkMath::ATan(gkScalar(0.5) * camera->sensor_y/camera->lens * rscr).valueRadians() / gkPi;
-				break;
-
-			// Horizontal
-			case 1:	//CAMERA_SENSOR_FIT_HOR
-				props.m_fov = gkScalar(360) * gkMath::ATan(gkScalar(0.5) * camera->sensor_x/camera->lens * rscr * rscr).valueRadians() / gkPi;
-				break;
-
-			// Auto
-			default://CAMERA_SENSOR_FIT_AUTO
-				props.m_fov = gkScalar(360) * gkMath::ATan(gkScalar(0.5) * camera->sensor_x/camera->lens * rscr * rscr).valueRadians() / gkPi;
-				break;
+		else
+		{
+			if (rren < rscr) sen = senx / rren * rscr;
+			else sen = senx;
 		}
+		break;
 	}
+
+	props.m_fov = gkScalar(360) * gkMath::ATan(gkScalar(0.5) * sen / camera->lens).valueRadians() / gkPi;
+	//props.m_fov = gkScalar(360) * gkMath::ATan(gkScalar(16) / camera->lens).valueRadians() / gkPi;
 }
 
 
