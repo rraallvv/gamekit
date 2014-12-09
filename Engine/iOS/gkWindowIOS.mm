@@ -252,8 +252,10 @@ bool gkWindowIOS::touchPressed(const OIS::MultiTouchEvent& arg)
 		gkMouse& data = m_mouse;		
  		OIS::MultiTouchState state = arg.state;
 		
+#if OGRE_NO_VIEWPORT_ORIENTATIONMODE == 0
 		transformInputState(state);
-		
+#endif
+
 		data.position.x = (gkScalar)state.X.abs;
 		data.position.y = (gkScalar)state.Y.abs;
 		data.relative.x = (gkScalar)state.X.rel;
@@ -336,8 +338,10 @@ bool gkWindowIOS::touchMoved(const OIS::MultiTouchEvent& arg)
 		gkMouse& data = m_mouse;		
  		OIS::MultiTouchState state = arg.state;
 		
+#if OGRE_NO_VIEWPORT_ORIENTATIONMODE == 0
 		transformInputState(state);
-		
+#endif
+
 		data.position.x = (gkScalar)state.X.abs;
 		data.position.y = (gkScalar)state.Y.abs;
 		data.relative.x = (gkScalar)state.X.rel;
@@ -355,8 +359,10 @@ bool gkWindowIOS::touchMoved(const OIS::MultiTouchEvent& arg)
 	gkJoystick& data = *m_joysticks[fid];
 	OIS::MultiTouchState state = arg.state;
 		
+#if OGRE_NO_VIEWPORT_ORIENTATIONMODE == 0
 	transformInputState(state);
-		
+#endif
+
 	data.buttons[0] = GK_Pressed;
 	data.buttonsPressed[0] = GK_NullState;
 	data.axes[0] = state.X.abs;
