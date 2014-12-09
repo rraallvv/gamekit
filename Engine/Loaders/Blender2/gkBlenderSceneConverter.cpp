@@ -813,20 +813,35 @@ void gkBlenderSceneConverter::convertObjectCamera(gkGameObject* gobj, Blender::O
 	props.m_start       = m_bscene->camera == bobj;
 
 
-	// Calculate the fov to fit the camera viwport entirely inside the scene's display window.
-
+	// Calculate the screen aspect ratio to match the current display window orientation
 	gkScalar w = m_gscene->getDisplayWindow()->getWidth();
 	gkScalar h = m_gscene->getDisplayWindow()->getHeight();
-	gkScalar rscr = w/h;	// display window aspect ratio
+	bool swap;
+#if OGRE_NO_VIEWPORT_ORIENTATIONMODE == 0
+	const gkString& iparam = gkEngine::getSingleton().getUserDefs().viewportOrientation;
+	if (!iparam.empty() && iparam == "portrait")
+		swap = w > h;
+	else
+#endif
+		swap = h > w;	// fall back to landscape
 
+	gkScalar width = swap ? h : w;
+	gkScalar height = swap ? w : h;
+
+	gkScalar rscr = width/height;	// display window aspect ratio
+
+
+	// Aspect ratio of the blender render dimensions (aka resolution in Blender's render properties)
 	gkScalar rw = gkScalar(m_bscene->r.xsch);
 	gkScalar rh = gkScalar(m_bscene->r.ysch);
-	gkScalar rren = rw/rh;	// aspect ratio of the blender render dimensions (aka resolution in Blender's render properties)
+	gkScalar rren = rw/rh;
 
 	gkScalar senx = camera->sensor_x;
 	gkScalar seny = camera->sensor_y;
 	gkScalar sen;
 
+
+	// Calculate the fov to fit the camera viwport entirely inside the scene's display window.
 	switch (camera->sensor_fit)
 	{
 	case 2:	//CAMERA_SENSOR_FIT_VERT
