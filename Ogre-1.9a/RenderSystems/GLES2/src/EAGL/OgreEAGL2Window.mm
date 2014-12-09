@@ -265,15 +265,15 @@ namespace Ogre {
             [mWindow addSubview:mViewController.view];
         
         mViewController.mGLSupport = mGLSupport;
-        
+
+        if(!mUsingExternalViewController)
+            [mWindow makeKeyAndVisible];
+
         if(!mUsingExternalViewController)
             mWindow.rootViewController = mViewController;
         
         if(!mUsingExternalView)
             [mView release];
-    
-        if(!mUsingExternalViewController)
-            [mWindow makeKeyAndVisible];
 
         mContext->createFramebuffer();
         
