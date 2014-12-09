@@ -227,7 +227,16 @@ int main(int argc, char **argv)
 													userInfo:nil
 													repeats:YES];
 	}
-	
+
+	// It doesn't hurt to ask for a call to layoutsubviews here, since iOS 7 apears to call this method much earlier when the render target window hasn't even been created yet
+	Ogre::RenderWindow *window = static_cast<Ogre::RenderWindow *>(Ogre::Root::getSingleton().getRenderSystem()->getRenderTarget(m_okit.getPrefs().wintitle));
+	if (window) {
+		UIView *view;
+		window->getCustomAttribute("VIEW", &view);
+		[view setNeedsLayout];
+		[view layoutIfNeeded];
+	}
+
 	[pool release];
 }
 
