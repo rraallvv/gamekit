@@ -65,6 +65,9 @@ using namespace Ogre;
 
 //	This fails to get a valid orientation sometimes when lauching the application
 //	[[UIDevice currentDevice] beginGeneratingDeviceOrientationNotifications];
+//	UIDeviceOrientation deviceOrientation = [UIDevice currentDevice].orientation;
+//	[[UIDevice currentDevice] endGeneratingDeviceOrientationNotifications];
+//
 //	if(!UIDeviceOrientationIsValidInterfaceOrientation(deviceOrientation))
 //		return;
 
