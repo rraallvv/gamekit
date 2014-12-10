@@ -819,11 +819,11 @@ void gkBlenderSceneConverter::convertObjectCamera(gkGameObject* gobj, Blender::O
 	bool swap;
 #if OGRE_NO_VIEWPORT_ORIENTATIONMODE == 0
 	const gkString& iparam = gkEngine::getSingleton().getUserDefs().viewportOrientation;
-	if (!iparam.empty() && iparam == "portrait")
-		swap = w > h;
+	if (!iparam.empty() && (iparam == "landscaperight" || iparam == "landscapeleft"))
+		swap = h > w;
 	else
 #endif
-		swap = h > w;	// fall back to landscape
+		swap = w > h;	// fall back to portrait, wich is Ogre's default
 
 	gkScalar width = swap ? h : w;
 	gkScalar height = swap ? w : h;
