@@ -55,7 +55,7 @@ using namespace Ogre;
     return [CAEAGLLayer class];
 }
 
-- (Radian)getFOVForViewPort:(Ogre::Viewport *)viewPort withDeviceOrientation:(UIDeviceOrientation)deviceOrientation
+- (void)fitViewPort:(Ogre::Viewport *)viewPort
 {
 	static Radian fov;
 	static Radian fovp;
@@ -70,7 +70,7 @@ using namespace Ogre;
 		// TODO: Add support for other orientations
 		//if (viewPort->getOrientationMode() == OR_PORTRAIT)
 		{
-			if (UIDeviceOrientationIsLandscape(deviceOrientation))
+			if (rscr > Real(1))
 			{
 				fov = viewPort->getCamera()->getFOVy();
 				if (rscr * rcam < Real(1))
@@ -110,10 +110,10 @@ using namespace Ogre;
 		calcfov = false;
 	}
 
-	if (UIDeviceOrientationIsLandscape(deviceOrientation))
-		return fovl;
+	if (rscr > Real(1))
+		viewPort->getCamera()->setFOVy(fovl);
 	else
-		return fovp;
+		viewPort->getCamera()->setFOVy(fovp);
 }
 
 - (void)layoutSubviews
@@ -182,9 +182,7 @@ using namespace Ogre;
         {
             Ogre::Viewport *viewPort = window->getViewport(0);
             viewPort->getCamera()->setAspectRatio((Real) width / (Real) height);
-
-			Radian fov = [self getFOVForViewPort:viewPort withDeviceOrientation:deviceOrientation];
-			viewPort->getCamera()->setFOVy(fov);
+			[self fitViewPort:viewPort];
        }
     }
 }
