@@ -55,6 +55,67 @@ using namespace Ogre;
     return [CAEAGLLayer class];
 }
 
+- (Radian)getFOVForViewPort:(Ogre::Viewport *)viewPort withDeviceOrientation:(UIDeviceOrientation)deviceOrientation
+{
+	static Radian fov;
+	static Radian fovp;
+	static Radian fovl;
+	static bool calcfov = true;
+
+	// TODO: Read the value of rcam from the camera, adding a new property to store the original camera viewport
+	Real rcam = 640.0/960.0;
+	Real rscr = viewPort->getCamera()->getAspectRatio();
+
+	if (calcfov) {
+		// TODO: Add support for other orientations
+		//if (viewPort->getOrientationMode() == OR_PORTRAIT)
+		{
+			if (UIDeviceOrientationIsLandscape(deviceOrientation))
+			{
+				fov = viewPort->getCamera()->getFOVy();
+				if (rscr * rcam < Real(1))
+				{
+					fovp = fovl = Real(2)*Math::ATan(rscr*rscr*Math::Tan(Real(0.5)*fov));
+				}
+				else if (rscr > rcam)
+				{
+					fovl = Real(2)*Math::ATan(rscr/rcam*Math::Tan(Real(0.5)*fov));
+					fovp = Real(2)*Math::ATan(rscr*rscr*Math::Tan(Real(0.5)*fov));
+				}
+				else
+				{
+					fovp = Real(2)*Math::ATan(rscr*rscr*Math::Tan(Real(0.5)*fov));
+					fovl = fov;
+				}
+			}
+			else
+			{
+				fov = viewPort->getCamera()->getFOVy();
+				if (rscr * rcam > Real(1))
+				{
+					fovp = fov;
+					fovl = Real(2)*Math::ATan(rscr*rscr*Math::Tan(Real(0.5)*fov));
+				}
+				else if (rscr < rcam)
+				{
+					fovp = fov;
+					fovl = Real(2)*Math::ATan(rscr/rcam*Math::Tan(Real(0.5)*fov));
+				}
+				else
+				{
+					fovp = fovl = fov;
+				}
+			}
+		}
+		calcfov = false;
+	}
+
+	if (UIDeviceOrientationIsLandscape(deviceOrientation))
+		return fovl;
+	else
+		return fovp;
+}
+
 - (void)layoutSubviews
 {
     // Change the viewport orientation based upon the current device orientation.
@@ -122,67 +183,8 @@ using namespace Ogre;
             Ogre::Viewport *viewPort = window->getViewport(0);
             viewPort->getCamera()->setAspectRatio((Real) width / (Real) height);
 
-			static Real fov;
-			static Real fovp;
-			static Real fovl;
-			static bool calcfov = true;
-
-			// TODO: Read the value of rcam from the camera, adding a new property to store the original camera viewport
-			float rcam = 640.0/960.0;
-			float rscr = (Real)width/(Real)height;
-
-			if (calcfov) {
-				if (viewPort->getOrientationMode() == OR_PORTRAIT)
-				{
-					if (UIDeviceOrientationIsLandscape(deviceOrientation))
-					{
-						fov = viewPort->getCamera()->getFOVy().valueRadians();
-						if (rscr * rcam < 1.0)
-						{
-							fovp = fovl = 2.0*atan(rscr*rscr*tan(0.5*fov));
-						}
-						else if (rscr > rcam)
-						{
-							fovl = 2.0*atan(rscr/rcam*tan(0.5*fov));
-							fovp = 2.0*atan(rscr*rscr*tan(0.5*fov));
-						}
-						else
-						{
-							fovp = 2.0*atan(rscr*rscr*tan(0.5*fov));
-							fovl = fov;
-						}
-					}
-					else
-					{
-						fov = viewPort->getCamera()->getFOVy().valueRadians();
-						if (rscr * rcam > 1.0)
-						{
-							fovp = fov;
-							fovl = 2.0*atan(rscr*rscr*tan(0.5*fov));
-						}
-						else if (rscr < rcam)
-						{
-							fovp = fov;
-							fovl = 2.0*atan(rscr/rcam*tan(0.5*fov));
-						}
-						else
-						{
-							fovp = fovl = fov;
-						}
-					}
-				}
-				else
-				{
-					fovp = viewPort->getCamera()->getFOVy().valueRadians();
-					fovl = viewPort->getCamera()->getFOVy().valueRadians();
-				}
-				calcfov = false;
-			}
-
-			if (UIDeviceOrientationIsLandscape(deviceOrientation))
-				viewPort->getCamera()->setFOVy(Radian(fovl));
-			else
-				viewPort->getCamera()->setFOVy(Radian(fovp));
+			Radian fov = [self getFOVForViewPort:viewPort withDeviceOrientation:deviceOrientation];
+			viewPort->getCamera()->setFOVy(fov);
        }
     }
 }
