@@ -57,25 +57,25 @@ using namespace Ogre;
 
 - (void)fitViewPort:(Ogre::Viewport *)viewPort
 {
-	static Radian fov;
 	static Radian fovp;
 	static Radian fovl;
 	static bool calcfov = true;
 
-	// TODO: Read the value of rcam from the camera, adding a new property to store the original camera viewport
-	Real rcam = 640.0/960.0;
 	Real rscr = viewPort->getCamera()->getAspectRatio();
 
 	if (calcfov) {
+		// TODO: Read the value of rcam from the camera, adding a new property to store the original camera viewport
+		Real rcam(640.0/960.0);
+		Radian fov = viewPort->getCamera()->getFOVy();
+
 		// TODO: Add support for other orientations
 		//if (viewPort->getOrientationMode() == OR_PORTRAIT)
 		{
 			if (rscr > Real(1))
 			{
-				fov = viewPort->getCamera()->getFOVy();
 				if (rscr * rcam < Real(1))
 				{
-					fovp = fovl = Real(2)*Math::ATan(rscr*rscr*Math::Tan(Real(0.5)*fov));
+					fovp = fovl = Real(2)*Math::ATan(rscr/rcam*Math::Tan(Real(0.5)*fov));
 				}
 				else if (rscr > rcam)
 				{
@@ -90,7 +90,6 @@ using namespace Ogre;
 			}
 			else
 			{
-				fov = viewPort->getCamera()->getFOVy();
 				if (rscr * rcam > Real(1))
 				{
 					fovp = fov;
@@ -103,7 +102,7 @@ using namespace Ogre;
 				}
 				else
 				{
-					fovp = fovl = fov;
+					fovp = fovl = Real(2)*Math::ATan(rscr/rcam*Math::Tan(Real(0.5)*fov));
 				}
 			}
 		}
@@ -182,7 +181,7 @@ using namespace Ogre;
         {
             Ogre::Viewport *viewPort = window->getViewport(0);
             viewPort->getCamera()->setAspectRatio((Real) width / (Real) height);
-			//[self fitViewPort:viewPort];
+			[self fitViewPort:viewPort];
        }
     }
 }
