@@ -182,7 +182,7 @@ using namespace Ogre;
         {
             Ogre::Viewport *viewPort = window->getViewport(0);
             viewPort->getCamera()->setAspectRatio((Real) width / (Real) height);
-			[self fitViewPort:viewPort];
+			//[self fitViewPort:viewPort];
        }
     }
 }
