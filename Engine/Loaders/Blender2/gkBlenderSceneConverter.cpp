@@ -815,6 +815,7 @@ void gkBlenderSceneConverter::convertObjectCamera(gkGameObject* gobj, Blender::O
 
 	// Aspect ratio of the blender render dimensions (aka resolution in Blender's render properties)
 	gkScalar baspect = gkScalar(m_bscene->r.xsch)/gkScalar(m_bscene->r.ysch);
+    props.m_contentaspect = baspect;
 
 	gkScalar senx = camera->sensor_x;
 	gkScalar seny = camera->sensor_y;

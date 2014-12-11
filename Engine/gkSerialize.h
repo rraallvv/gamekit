@@ -204,6 +204,7 @@ public:
 	gkScalar    m_clipstart;
 	gkScalar    m_clipend;
 	gkScalar    m_fov;
+    gkScalar    m_contentaspect;
 	gkScalar    m_orthoscale;
 	bool        m_start;
 	int         m_type;

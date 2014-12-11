@@ -53,6 +53,7 @@ namespace Ogre {
         mFarDist(100000.0f), 
         mNearDist(100.0f), 
         mAspect(1.33333333333333f), 
+        mContentAspect(1.33333333333333f),
 		mOrthoHeight(1000),
         mFrustumOffset(Vector2::ZERO),
         mFocalLength(1.0f),
@@ -913,9 +914,22 @@ namespace Ogre {
     }
 
     //-----------------------------------------------------------------------
+    Real Frustum::getContentAspectRatio(void) const
+    {
+        return mContentAspect;
+    }
+
+    //-----------------------------------------------------------------------
     void Frustum::setAspectRatio(Real r)
     {
         mAspect = r;
+        invalidateFrustum();
+    }
+
+    //-----------------------------------------------------------------------
+    void Frustum::setContentAspectRatio(Real r)
+    {
+        mContentAspect = r;
         invalidateFrustum();
     }
 

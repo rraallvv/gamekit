@@ -96,6 +96,8 @@ namespace Ogre
         Real mNearDist;
         /// x/y viewport ratio - default 1.3333
         Real mAspect;
+        /// x/y content viewport ratio - default 1.3333
+        Real mContentAspect;
         /// Ortho height size (world units)
         Real mOrthoHeight;
         /// Off-axis frustum center offset - default (0.0, 0.0)
@@ -269,9 +271,24 @@ namespace Ogre
         */
         virtual void setAspectRatio(Real ratio);
 
+        /** Sets the content aspect ratio for the frustum viewport.
+         @remarks
+             The content aspect ratio is used to perform an automatic calculation of the field-of-view
+             so that a rectangle with this ratio always fits inside the real viewport. Just like a video player
+             in full screen mode, but without cropping the viewport or adding black strips near the border.
+         @par
+             The default for most fullscreen windows is 1.3333 - this is also assumed by Ogre unless you
+             use this method to state otherwise.
+         */
+        virtual void setContentAspectRatio(Real ratio);
+
         /** Retrieves the current aspect ratio.
         */
         virtual Real getAspectRatio(void) const;
+
+		/** Retrieves the current content aspect ratio.
+		 */
+		virtual Real getContentAspectRatio(void) const;
 
         /** Sets frustum offsets, used in stereo rendering.
         @remarks

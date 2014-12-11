@@ -64,8 +64,7 @@ using namespace Ogre;
 	Real rscr = viewPort->getCamera()->getAspectRatio();
 
 	if (calcfov) {
-		// TODO: Read the value of rcam from the camera, adding a new property to store the original camera viewport
-		Real rcam(640.0/960.0);
+		Real rcam = viewPort->getCamera()->getContentAspectRatio();
 		Radian fov = viewPort->getCamera()->getFOVy();
 
 		// TODO: Add support for other orientations

@@ -64,6 +64,7 @@ void gkCamera::createInstanceImpl(void)
 		float fovy = 2 * atan(tan(m_cameraProps.m_fov * gkPi / 360) / ratio);
 		m_camera->setProjectionType(Ogre::PT_PERSPECTIVE);
 		m_camera->setFOVy(gkRadian(fovy));
+		m_camera->setContentAspectRatio(m_cameraProps.m_contentaspect);
 	}
 
 
