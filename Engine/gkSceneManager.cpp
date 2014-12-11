@@ -32,6 +32,8 @@
 #include "gkUtils.h"
 #include "gkEngine.h"
 #include "gkUserDefs.h"
+#include "gkLogicManager.h"
+#include "gkLogicLink.h"
 
 
 gkSceneManager::gkSceneManager()
