@@ -259,6 +259,9 @@
 #define CAM_DS_EXPAND                            64
 #define CAM_PANORAMA                             128
 #define CAM_YF_NO_QMC                            512
+#define CAM_SENSOR_FIT_AUTO                      0
+#define CAM_SENSOR_FIT_HOR                       1
+#define CAM_SENSOR_FIT_VERT                      2
 #define CM_RESOL                                 32
 #define CM_TABLE                                 256
 #define CM_TABLEDIV                              (1.0f/256.0f)
