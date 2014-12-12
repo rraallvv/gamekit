@@ -67,3 +67,10 @@ if (OGREKIT_CREATE_OGRE_DEPENDENCY_DIR)
 		COMMAND ${CMAKE_COMMAND} ARGS -E copy_if_different ${FILEPATH} ${OGRE_PREBUILT_DEPENDENCY_LIB_DIR}
 	)
 endif()
+
+# Fix the error duplicate symbol when linking together with zlib
+string(FIND ${CMAKE_CXX_FLAGS_DEBUG} "DDEBUG" _POS)
+if (APPLE AND NOT(_POS EQUAL -1))
+	string(REGEX MATCH "(${CMAKE_CXX_FLAGS_DEBUG_INIT})?(.*)" _OUT "${CMAKE_CXX_FLAGS_DEBUG}")
+	set_property(TARGET ${OGREKIT_FREETYPE_TARGET} PROPERTY XCODE_ATTRIBUTE_OTHER_CFLAGS[variant=Debug] "${CMAKE_MATCH_2} -Dz_verbose=ft2_z_verbose -Dz_error=ft2_z_error")
+endif()
