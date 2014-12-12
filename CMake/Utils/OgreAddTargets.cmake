@@ -36,6 +36,17 @@ endfunction()
 # If in the list of source files the key word SEPARATE is specified, then
 # any source file after that will be compiled separately.
 macro(create_unity_build_files TARGETNAME)
+  # list of files that can't be included in the Unity build files
+  set(_SKIP_FILE_LIST "")
+  if(APPLE AND NOT OGRE_BUILD_PLATFORM_APPLE_IOS)
+    list(APPEND _SKIP_FILE_LIST
+      "gkRayTestNode.cpp"
+      "gkParticleManager.cpp"
+      "gkOgreParticleAffector.cpp"
+      "gkOgreParticleEmitter.cpp"
+    )
+  endif()
+
   # first step: build the primary and separate lists
   set(_PRIMARY "")
   set(_EXCLUDES "")
@@ -71,7 +82,7 @@ macro(create_unity_build_files TARGETNAME)
       get_filename_component(_EXT ${_FILE} EXT)
       list(FIND _EXCLUDES ${_FILE} _EXCLUDED)
       if ((_EXT STREQUAL ".cpp") AND (_EXCLUDED EQUAL "-1"))
-        set(_OBJC FALSE)
+        set(_SKIP FALSE)
         if (APPLE)
           # test if file imports Objective-C headers
           file(READ ${_FILE} _CUR)
@@ -81,10 +92,17 @@ macro(create_unity_build_files TARGETNAME)
             ${_CUR}
           )
           if (NOT _MATCH STREQUAL "")
-            set(_OBJC TRUE)
+            set(_SKIP TRUE)
           endif()
+          # test if file is in skip list
+          foreach(_SKIP_FILE ${_SKIP_FILE_LIST})
+            string(FIND ${_FILE} ${_SKIP_FILE} _EXCLUDED)
+            if (NOT (_EXCLUDED EQUAL "-1"))
+              set(_SKIP TRUE)
+            endif()
+          endforeach()
         endif()
-        if (NOT _OBJC)
+        if (NOT _SKIP)
           # add file only if it does not import Objetive-C headers
           set(_FILE_CONTENTS "${_FILE_CONTENTS}\#include \"${_FILE}\"\n")
           math(EXPR _FILE_CNT "${_FILE_CNT}+1")
