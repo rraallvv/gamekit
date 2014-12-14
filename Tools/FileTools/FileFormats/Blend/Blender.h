@@ -3,7 +3,7 @@
 // Generated from a Blender(265) file.
 // actually there needed some manual work to be done
 // 1) some structs had to be moved because of references
-// 2) FBTuint64 --> FBTuint64
+// 2) uint64_t --> FBTuint64
 #include "fbtTypes.h"
 
 #ifdef near
@@ -149,6 +149,8 @@ struct RemeshModifierData;
 struct SkinModifierData;
 struct TriangulateModifierData;
 struct LaplacianSmoothModifierData;
+struct UVWarpModifierData;
+struct MeshCacheModifierData;
 struct EditLatt;
 struct Lattice;
 struct bDeformGroup;
@@ -228,6 +230,7 @@ struct uiStyle;
 struct uiWidgetColors;
 struct uiWidgetStateColors;
 struct uiPanelColors;
+struct uiGradientColors;
 struct ThemeUI;
 struct ThemeSpace;
 struct ThemeWireColor;
@@ -239,6 +242,7 @@ struct bScreen;
 struct ScrVert;
 struct ScrEdge;
 struct Panel;
+struct uiList;
 struct ScrArea;
 struct ARegion;
 struct FileGlobal;
@@ -417,6 +421,7 @@ struct TexNodeOutput;
 struct NodeKeyingScreenData;
 struct NodeKeyingData;
 struct NodeTrackPosData;
+struct NodeTranslateData;
 struct NodeShaderScript;
 struct NodeShaderTangent;
 struct NodeShaderNormalMap;
@@ -522,6 +527,9 @@ struct MaskSplinePoint;
 struct MaskSpline;
 struct MaskLayerShape;
 struct MaskLayer;
+struct RigidBodyWorld;
+struct RigidBodyOb;
+struct RigidBodyCon;
 
 
 
@@ -601,6 +609,7 @@ struct PreviewImage
     short changed[2];
     short changed_timestamp[2];
     int *rect[2];
+    void *gputexture[2];
 };
 
 struct IpoDriver
@@ -1093,7 +1102,8 @@ struct MIntProperty
 
 struct MStringProperty
 {
-    char s[256];
+    char s[255];
+    char s_len;
 };
 
 struct OrigSpaceFace
@@ -1625,7 +1635,16 @@ struct UnifiedPaintSettings
     float alpha;
     float weight;
     int flag;
-    int pad;
+    float last_x;
+    float last_y;
+    float last_angle;
+    float special_rotation;
+    int draw_anchored;
+    int anchored_size;
+    float anchored_location[3];
+    float anchored_initial_mouse[2];
+    int draw_pressure;
+    float pressure_value;
 };
 
 struct bStats
@@ -1753,7 +1772,7 @@ struct uiFont
     short blf_id;
     short uifont_id;
     short r_to_l;
-    short pad;
+    short hinting;
 };
 
 struct uiFontStyle
@@ -1801,147 +1820,18 @@ struct uiWidgetStateColors
 struct uiPanelColors
 {
     char header[4];
+    char back[4];
     short show_header;
-    short pad;
+    short show_back;
+    int pad;
 };
 
-struct ThemeSpace
+struct uiGradientColors
 {
-    char back[4];
-    char title[4];
-    char text[4];
-    char text_hi[4];
-    char header[4];
-    char header_title[4];
-    char header_text[4];
-    char header_text_hi[4];
-    char button[4];
-    char button_title[4];
-    char button_text[4];
-    char button_text_hi[4];
-    char list[4];
-    char list_title[4];
-    char list_text[4];
-    char list_text_hi[4];
-    char panel[4];
-    char panel_title[4];
-    char panel_text[4];
-    char panel_text_hi[4];
-    char shade1[4];
-    char shade2[4];
-    char hilite[4];
-    char grid[4];
-    char wire[4];
-    char select[4];
-    char lamp[4];
-    char speaker[4];
-    char empty[4];
-    char camera[4];
-    char pad[8];
-    char active[4];
-    char group[4];
-    char group_active[4];
-    char transform[4];
-    char vertex[4];
-    char vertex_select[4];
-    char edge[4];
-    char edge_select[4];
-    char edge_seam[4];
-    char edge_sharp[4];
-    char edge_facesel[4];
-    char edge_crease[4];
-    char face[4];
-    char face_select[4];
-    char face_dot[4];
-    char extra_edge_len[4];
-    char extra_face_angle[4];
-    char extra_face_area[4];
-    char pad3[4];
-    char normal[4];
-    char vertex_normal[4];
-    char bone_solid[4];
-    char bone_pose[4];
-    char bone_pose_active[4];
-    char strip[4];
-    char strip_select[4];
-    char cframe[4];
-    char nurb_uline[4];
-    char nurb_vline[4];
-    char act_spline[4];
-    char nurb_sel_uline[4];
-    char nurb_sel_vline[4];
-    char lastsel_point[4];
-    char handle_free[4];
-    char handle_auto[4];
-    char handle_vect[4];
-    char handle_align[4];
-    char handle_auto_clamped[4];
-    char handle_sel_free[4];
-    char handle_sel_auto[4];
-    char handle_sel_vect[4];
-    char handle_sel_align[4];
-    char handle_sel_auto_clamped[4];
-    char ds_channel[4];
-    char ds_subchannel[4];
-    char console_output[4];
-    char console_input[4];
-    char console_info[4];
-    char console_error[4];
-    char console_cursor[4];
-    char vertex_size;
-    char outline_width;
-    char facedot_size;
-    char noodle_curving;
-    char syntaxl[4];
-    char syntaxn[4];
-    char syntaxb[4];
-    char syntaxv[4];
-    char syntaxc[4];
-    char movie[4];
-    char movieclip[4];
-    char mask[4];
-    char image[4];
-    char scene[4];
-    char audio[4];
-    char effect[4];
-    char hpad0[4];
-    char transition[4];
-    char meta[4];
-    char editmesh_active[4];
-    char handle_vertex[4];
-    char handle_vertex_select[4];
-    char handle_vertex_size;
-    char marker_outline[4];
-    char marker[4];
-    char act_marker[4];
-    char sel_marker[4];
-    char dis_marker[4];
-    char lock_marker[4];
-    char bundle_solid[4];
-    char path_before[4];
-    char path_after[4];
-    char camera_path[4];
-    char hpad[3];
-    char preview_back[4];
-    char preview_stitch_face[4];
-    char preview_stitch_edge[4];
-    char preview_stitch_vert[4];
-    char preview_stitch_stitchable[4];
-    char preview_stitch_unstitchable[4];
-    char preview_stitch_active[4];
-    char match[4];
-    char selected_highlight[4];
-    char skin_root[4];
-    char anim_active[4];
-    char anim_non_active[4];
-    char nla_tweaking[4];
-    char nla_tweakdupli[4];
-    char nla_transition[4];
-    char nla_transition_sel[4];
-    char nla_meta[4];
-    char nla_meta_sel[4];
-    char nla_sound[4];
-    char nla_sound_sel[4];
+    char gradient[4];
+    char high_gradient[4];
+    int show_grad;
+    int pad2;
 };
 
 struct ThemeWireColor
@@ -1958,6 +1848,7 @@ struct bAddon
     bAddon *next;
     bAddon *prev;
     char module[64];
+    IDProperty *prop;
 };
 
 struct SolidLight
@@ -2002,11 +1893,21 @@ struct Panel
     int sortorder;
     Panel *paneltab;
     void *activedata;
+};
+
+struct uiList
+{
+    uiList *next;
+    uiList *prev;
+    void *type;
+    void *padp;
+    char list_id[64];
+    int layout_type;
+    int padi;
     int list_scroll;
     int list_size;
     int list_last_len;
     int list_grip_size;
-    char list_search[64];
 };
 
 struct FileGlobal
@@ -3450,6 +3351,13 @@ struct NodeTrackPosData
     char track_name[64];
 };
 
+struct NodeTranslateData
+{
+    char wrap_axis;
+    char relative;
+    char pad[6];
+};
+
 struct NodeShaderScript
 {
     int mode;
@@ -3647,6 +3555,8 @@ struct SPHFluidSettings
     float buoyancy;
     int flag;
     int spring_frames;
+    short solver;
+    short pad[3];
 };
 
 struct ClothSimSettings
@@ -4151,6 +4061,58 @@ struct MaskLayerShape
     char pad[7];
 };
 
+struct RigidBodyOb
+{
+    void *physics_object;
+    void *physics_shape;
+    short type;
+    short shape;
+    int flag;
+    int col_groups;
+    int pad;
+    float mass;
+    float friction;
+    float restitution;
+    float margin;
+    float lin_damping;
+    float ang_damping;
+    float lin_sleep_thresh;
+    float ang_sleep_thresh;
+    float orn[4];
+    float pos[3];
+    float pad1;
+};
+
+struct RigidBodyCon
+{
+    Object *ob1;
+    Object *ob2;
+    short type;
+    short num_solver_iterations;
+    int flag;
+    float breaking_threshold;
+    float pad;
+    float limit_lin_x_lower;
+    float limit_lin_x_upper;
+    float limit_lin_y_lower;
+    float limit_lin_y_upper;
+    float limit_lin_z_lower;
+    float limit_lin_z_upper;
+    float limit_ang_x_lower;
+    float limit_ang_x_upper;
+    float limit_ang_y_lower;
+    float limit_ang_y_upper;
+    float limit_ang_z_lower;
+    float limit_ang_z_upper;
+    float spring_stiffness_x;
+    float spring_stiffness_y;
+    float spring_stiffness_z;
+    float spring_damping_x;
+    float spring_damping_y;
+    float spring_damping_z;
+    void *physics_constraint;
+};
+
 struct IDPropertyData
 {
     void *pointer;
@@ -4181,6 +4143,7 @@ struct Library
     char name[1024];
     char filepath[1024];
     Library *parent;
+    PackedFile *packedfile;
 };
 
 struct IpoCurve
@@ -4316,6 +4279,8 @@ struct Image
     float aspx;
     float aspy;
     ColorManagedColorspaceSettings colorspace_settings;
+    char alpha_mode;
+    char pad[7];
 };
 
 struct ColorBand
@@ -4774,8 +4739,10 @@ struct Mesh
     short drawflag;
     short smoothresh;
     short flag;
-    short subdiv;
-    short subdivr;
+    char cd_flag;
+    char pad;
+    char subdiv;
+    char subdivr;
     char subsurftype;
     char editflag;
     short totcol;
@@ -5396,6 +5363,43 @@ struct LaplacianSmoothModifierData
     short repeat;
 };
 
+struct UVWarpModifierData
+{
+    ModifierData modifier;
+    char axis_u;
+    char axis_v;
+    char pad[6];
+    float center[2];
+    Object *object_src;
+    char bone_src[64];
+    Object *object_dst;
+    char bone_dst[64];
+    char vgroup_name[64];
+    char uvlayer_name[64];
+};
+
+struct MeshCacheModifierData
+{
+    ModifierData modifier;
+    char flag;
+    char type;
+    char time_mode;
+    char play_mode;
+    char forward_axis;
+    char up_axis;
+    char flip_axis;
+    char interp;
+    float factor;
+    char deform_mode;
+    char pad[7];
+    float frame_start;
+    float frame_scale;
+    float eval_frame;
+    float eval_time;
+    float eval_factor;
+    char filepath[1024];
+};
+
 struct Lattice
 {
     ID id;
@@ -5496,7 +5500,7 @@ struct Object
     short ipoflag;
     short scaflag;
     char scavisflag;
-    char pad5;
+    char depsflag;
     int dupon;
     int dupoff;
     int dupsta;
@@ -5520,9 +5524,8 @@ struct Object
     short rotmode;
     char boundtype;
     char collision_boundtype;
-    char restrictflag;
+    short dtx;
     char dt;
-    char dtx;
     char empty_drawtype;
     float empty_drawsize;
     float dupfacesca;
@@ -5537,8 +5540,9 @@ struct Object
     int gameflag;
     int gameflag2;
     BulletSoftBody *bsoft;
+    char restrictflag;
+    char recalc;
     short softflag;
-    short recalc;
     float anisotropicFriction[3];
     ListBase constraints;
     ListBase nlastrips;
@@ -5562,6 +5566,8 @@ struct Object
     ListBase gpulamp;
     ListBase pc_ids;
     ListBase *duplilist;
+    RigidBodyOb *rigidbody_object;
+    RigidBodyCon *rigidbody_constraint;
     float ima_ofs[2];
 };
 
@@ -5759,7 +5765,8 @@ struct ImageFormatData
     short cineon_black;
     float cineon_gamma;
     char jp2_flag;
-    char pad[7];
+    char jp2_codec;
+    char pad[6];
     ColorManagedViewSettings view_settings;
     ColorManagedDisplaySettings display_settings;
 };
@@ -5844,7 +5851,8 @@ struct RenderData
     short bake_quad_split;
     float bake_maxdist;
     float bake_biasdist;
-    float bake_pad;
+    short bake_samples;
+    short bake_pad;
     char pic[1024];
     int stamp;
     short stamp_font_id;
@@ -5909,7 +5917,7 @@ struct GameData
     short physubstep;
     short maxphystep;
     short obstacleSimulation;
-    short pad1;
+    short raster_storage;
     float levelHeight;
     float deactivationtime;
     float lineardeactthreshold;
@@ -5952,17 +5960,8 @@ struct Sculpt
     Paint paint;
     int flags;
     int radial_symm[3];
-    float last_x;
-    float last_y;
-    float last_angle;
-    int draw_anchored;
-    int anchored_size;
-    float anchored_location[3];
-    float anchored_initial_mouse[2];
-    int draw_pressure;
-    float pressure_value;
-    float special_rotation;
-    int pad;
+    int detail_size;
+    int symmetrize_direction;
 };
 
 struct UvSculpt
@@ -6011,7 +6010,7 @@ struct ToolSettings
     short uvcalc_flag;
     short uv_flag;
     short uv_selectmode;
-    short uv_subsurf_level;
+    short pad2;
     short gpencil_flags;
     short autoik_chainlen;
     ImagePaintSettings imapaint;
@@ -6022,7 +6021,7 @@ struct ToolSettings
     short autokey_mode;
     short autokey_flag;
     char multires_subdiv_type;
-    char pad2[5];
+    char pad3[5];
     short skgen_resolution;
     float skgen_threshold_internal;
     float skgen_threshold_external;
@@ -6124,6 +6123,7 @@ struct Scene
     ColorManagedViewSettings view_settings;
     ColorManagedDisplaySettings display_settings;
     ColorManagedColorspaceSettings sequencer_colorspace_settings;
+    RigidBodyWorld *rigidbody_world;
 };
 
 struct BGpic
@@ -6156,7 +6156,8 @@ struct View3D
     float dist;
     float bundle_size;
     short bundle_drawtype;
-    char pad[6];
+    short pad;
+    int matcap_icon;
     int lay_used;
     short persp;
     short view;
@@ -6197,6 +6198,7 @@ struct View3D
     short xray;
     char pad3[2];
     void *properties_storage;
+    Material *defmaterial;
     bGPdata *gpd;
 };
 
@@ -6385,33 +6387,6 @@ struct SpaceFile
     short pad2;
 };
 
-struct MovieTrackingDopesheet
-{
-    int ok;
-    short sort_method;
-    short flag;
-    ListBase channels;
-    int tot_channel;
-    int pad;
-};
-
-struct MovieTracking
-{
-    MovieTrackingSettings settings;
-    MovieTrackingCamera camera;
-    ListBase tracks;
-    MovieTrackingReconstruction reconstruction;
-    MovieTrackingStabilization stabilization;
-    MovieTrackingTrack *act_track;
-    ListBase objects;
-    int objectnr;
-    int tot_object;
-    MovieTrackingStats *stats;
-    MovieTrackingDopesheet dopesheet;
-};
-
-
-
 struct Scopes
 {
     int ok;
@@ -6432,40 +6407,6 @@ struct Scopes
     float *vecscope;
     int waveform_tot;
     int pad;
-};
-
-struct MovieClipScopes
-{
-    short ok;
-    short use_track_mask;
-    int track_preview_height;
-    int frame_width;
-    int frame_height;
-    MovieTrackingMarker undist_marker;
-    void *track_search;
-    void *track_preview;
-    float track_pos[2];
-    short track_disabled;
-    short track_locked;
-    int framenr;
-    MovieTrackingTrack *track;
-    MovieTrackingMarker *marker;
-    float slide_scale[2];
-};
-
-struct CurveMapping
-{
-    int flag;
-    int cur;
-    int preset;
-    int changed_timestamp;
-    rctf curr;
-    rctf clipr;
-    CurveMap cm[4];
-    float black[3];
-    float white[3];
-    float bwmul[3];
-    float sample[3];
 };
 
 struct SpaceImage
@@ -6530,7 +6471,8 @@ struct SpaceText
     char findstr[256];
     char replacestr[256];
     short margin_column;
-    char pad[6];
+    short lheight_dpi;
+    char pad[4];
     void *drawcache;
 };
 
@@ -6576,7 +6518,7 @@ struct SpaceNode
     short flag;
     short pad1;
     float aspect;
-    float aspect_sqrt;
+    float pad2;
     float xof;
     float yof;
     float zoom;
@@ -6632,6 +6574,25 @@ struct SpaceUserPref
     int spacetype;
     int pad;
     char filter[64];
+};
+
+struct MovieClipScopes
+{
+    short ok;
+    short use_track_mask;
+    int track_preview_height;
+    int frame_width;
+    int frame_height;
+    MovieTrackingMarker undist_marker;
+    void *track_search;
+    void *track_preview;
+    float track_pos[2];
+    short track_disabled;
+    short track_locked;
+    int framenr;
+    MovieTrackingTrack *track;
+    MovieTrackingMarker *marker;
+    float slide_scale[2];
 };
 
 struct SpaceClip
@@ -6710,11 +6671,155 @@ struct ThemeUI
     uiWidgetColors wcol_list_item;
     uiWidgetStateColors wcol_state;
     uiPanelColors panel;
+    float menu_shadow_fac;
+    short menu_shadow_width;
+    short pad;
     char iconfile[256];
     float icon_alpha;
     char xaxis[4];
     char yaxis[4];
     char zaxis[4];
+};
+
+struct ThemeSpace
+{
+    char back[4];
+    char title[4];
+    char text[4];
+    char text_hi[4];
+    char header[4];
+    char header_title[4];
+    char header_text[4];
+    char header_text_hi[4];
+    char button[4];
+    char button_title[4];
+    char button_text[4];
+    char button_text_hi[4];
+    char list[4];
+    char list_title[4];
+    char list_text[4];
+    char list_text_hi[4];
+    uiPanelColors panelcolors;
+    uiGradientColors gradients;
+    char shade1[4];
+    char shade2[4];
+    char hilite[4];
+    char grid[4];
+    char wire[4];
+    char select[4];
+    char lamp[4];
+    char speaker[4];
+    char empty[4];
+    char camera[4];
+    char pad[8];
+    char active[4];
+    char group[4];
+    char group_active[4];
+    char transform[4];
+    char vertex[4];
+    char vertex_select[4];
+    char edge[4];
+    char edge_select[4];
+    char edge_seam[4];
+    char edge_sharp[4];
+    char edge_facesel[4];
+    char edge_crease[4];
+    char face[4];
+    char face_select[4];
+    char face_dot[4];
+    char extra_edge_len[4];
+    char extra_face_angle[4];
+    char extra_face_area[4];
+    char pad3[4];
+    char normal[4];
+    char vertex_normal[4];
+    char bone_solid[4];
+    char bone_pose[4];
+    char bone_pose_active[4];
+    char strip[4];
+    char strip_select[4];
+    char cframe[4];
+    char nurb_uline[4];
+    char nurb_vline[4];
+    char act_spline[4];
+    char nurb_sel_uline[4];
+    char nurb_sel_vline[4];
+    char lastsel_point[4];
+    char handle_free[4];
+    char handle_auto[4];
+    char handle_vect[4];
+    char handle_align[4];
+    char handle_auto_clamped[4];
+    char handle_sel_free[4];
+    char handle_sel_auto[4];
+    char handle_sel_vect[4];
+    char handle_sel_align[4];
+    char handle_sel_auto_clamped[4];
+    char ds_channel[4];
+    char ds_subchannel[4];
+    char console_output[4];
+    char console_input[4];
+    char console_info[4];
+    char console_error[4];
+    char console_cursor[4];
+    char console_select[4];
+    char pad1[4];
+    char vertex_size;
+    char outline_width;
+    char facedot_size;
+    char noodle_curving;
+    char syntaxl[4];
+    char syntaxs[4];
+    char syntaxb[4];
+    char syntaxn[4];
+    char syntaxv[4];
+    char syntaxc[4];
+    char syntaxd[4];
+    char syntaxr[4];
+    char movie[4];
+    char movieclip[4];
+    char mask[4];
+    char image[4];
+    char scene[4];
+    char audio[4];
+    char effect[4];
+    char transition[4];
+    char meta[4];
+    char editmesh_active[4];
+    char handle_vertex[4];
+    char handle_vertex_select[4];
+    char handle_vertex_size;
+    char marker_outline[4];
+    char marker[4];
+    char act_marker[4];
+    char sel_marker[4];
+    char dis_marker[4];
+    char lock_marker[4];
+    char bundle_solid[4];
+    char path_before[4];
+    char path_after[4];
+    char camera_path[4];
+    char hpad[3];
+    char preview_back[4];
+    char preview_stitch_face[4];
+    char preview_stitch_edge[4];
+    char preview_stitch_vert[4];
+    char preview_stitch_stitchable[4];
+    char preview_stitch_unstitchable[4];
+    char preview_stitch_active[4];
+    char match[4];
+    char selected_highlight[4];
+    char skin_root[4];
+    char anim_active[4];
+    char anim_non_active[4];
+    char nla_tweaking[4];
+    char nla_tweakdupli[4];
+    char nla_transition[4];
+    char nla_transition_sel[4];
+    char nla_meta[4];
+    char nla_meta_sel[4];
+    char nla_sound[4];
+    char nla_sound_sel[4];
 };
 
 struct bTheme
@@ -6747,6 +6852,8 @@ struct bTheme
 
 struct UserDef
 {
+    int versionfile;
+    int subversionfile;
     int flag;
     int dupflag;
     int savetime;
@@ -6764,9 +6871,10 @@ struct UserDef
     short timecode_style;
     short versions;
     short dbl_click_time;
-    int gameflags;
-    int wheellinescroll;
+    short gameflags;
+    short wheellinescroll;
     int uiflag;
+    int uiflag2;
     int language;
     short userpref;
     short viewzoom;
@@ -6843,7 +6951,7 @@ struct UserDef
     int compute_device_type;
     int compute_device_id;
     float fcu_inactive_alpha;
-    float pad;
+    float pixelsize;
 };
 
 struct bScreen
@@ -6879,7 +6987,8 @@ struct ScrVert
     ScrVert *prev;
     ScrVert *newv;
     vec2s vec;
-    int flag;
+    short flag;
+    short editflag;
 };
 
 struct ScrArea
@@ -6897,10 +7006,10 @@ struct ScrArea
     short winx;
     short winy;
     short headertype;
-    short pad;
     short do_refresh;
-    short cursor;
     short flag;
+    short region_active_win;
+    short pad;
     void *type;
     ListBase spacedata;
     ListBase regionbase;
@@ -6927,11 +7036,14 @@ struct ARegion
     short do_draw;
     short do_draw_overlay;
     short swap;
-    short pad[3];
+    short overlap;
+    short pad[2];
     void *type;
     ListBase uiblocks;
     ListBase panels;
+    ListBase ui_lists;
     ListBase handlers;
+    void *regiontimer;
     char *headerstr;
     void *regiondata;
 };
@@ -7004,7 +7116,8 @@ struct Sequence
     int blend_mode;
     float blend_opacity;
     int sfra;
-    int pad;
+    char alpha_mode;
+    char pad[3];
     ListBase modifiers;
 };
 
@@ -7028,6 +7141,21 @@ struct ColorBalanceModifierData
     SequenceModifierData modifier;
     StripColorBalance color_balance;
     float color_multiply;
+};
+
+struct CurveMapping
+{
+    int flag;
+    int cur;
+    int preset;
+    int changed_timestamp;
+    rctf curr;
+    rctf clipr;
+    CurveMap cm[4];
+    float black[3];
+    float white[3];
+    float bwmul[3];
+    float sample[3];
 };
 
 struct CurvesModifierData
@@ -7549,10 +7677,6 @@ struct NodeTexMagic
     int pad;
 };
 
-
-
-
-
 struct Brush
 {
     ID id;
@@ -7618,6 +7742,8 @@ struct ParticleData
     float fuv[4];
     float foffset;
     float size;
+    float sphdensity;
+    int pad;
     int hair_index;
     short flag;
     short alive;
@@ -8263,7 +8389,30 @@ struct Speaker
     short pad1[3];
 };
 
+struct MovieTrackingDopesheet
+{
+    int ok;
+    short sort_method;
+    short flag;
+    ListBase channels;
+    int tot_channel;
+    int pad;
+};
 
+struct MovieTracking
+{
+    MovieTrackingSettings settings;
+    MovieTrackingCamera camera;
+    ListBase tracks;
+    MovieTrackingReconstruction reconstruction;
+    MovieTrackingStabilization stabilization;
+    MovieTrackingTrack *act_track;
+    ListBase objects;
+    int objectnr;
+    int tot_object;
+    MovieTrackingStats *stats;
+    MovieTrackingDopesheet dopesheet;
+};
 
 struct MovieClip
 {
@@ -8288,8 +8437,6 @@ struct MovieClip
     ColorManagedColorspaceSettings colorspace_settings;
 };
 
-
-
 struct MovieTrackingObject
 {
     MovieTrackingObject *next;
@@ -8302,10 +8449,6 @@ struct MovieTrackingObject
     int keyframe1;
     int keyframe2;
 };
-
-
-
-
 
 struct DynamicPaintSurface
 {
@@ -8421,6 +8564,24 @@ struct MaskLayer
     char pad[7];
     char flag;
     char restrictflag;
+};
+
+struct RigidBodyWorld
+{
+    EffectorWeights *effector_weights;
+    Group *group;
+    Object **objects;
+    Group *constraints;
+    int pad;
+    float ltime;
+    PointCache *pointcache;
+    ListBase ptcaches;
+    int numbodies;
+    short steps_per_second;
+    short num_solver_iterations;
+    int flag;
+    float time_scale;
+    void *physics_world;
 };
 
 /** @}*/
