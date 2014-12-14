@@ -710,6 +710,25 @@ void gsEngine::unloadBlendFile(const gkString& name)
 		if (!m_engine->isInitialized())
 			gkLogMessage("gsEngine: unloadBlendFile on uninitialized engine.");
 
+		gkBlendFile* gkb = gkBlendLoader::getSingleton().getFileByName(gkUtils::getFile(name));
+
+		gkScene* scene = gkb->getMainScene();
+		gkScene* activeScene = m_engine->getActiveScene();
+
+		if (scene)
+		{
+			if (activeScene)
+			{
+				gkGameObjectHashMap::Iterator it = activeScene->getObjects();
+				while (it.hasMoreElements())
+				{
+					gkGameObject* obj = it.getNext().second;
+					if(obj->getGroupName() == scene->getGroupName())
+						activeScene->destroyObject(obj);
+				}
+			}
+		}
+
 		gkBlendLoader::getSingleton().unloadFile(gkUtils::getFile(name));
 	}
 }
