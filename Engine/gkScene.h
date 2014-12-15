@@ -196,7 +196,7 @@ public:
 
 	void _unloadAndDestroy(gkGameObject* obj);
 
-	bool _replaceObjectInScene(gkGameObject* obj, gkScene* osc, gkScene* nsc);
+	bool _replaceObjectInScene(gkGameObject* obj);
 	void _eraseObject(gkGameObject* obj);
 
 	void _eraseAllObjects();

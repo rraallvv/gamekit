@@ -361,29 +361,29 @@ gkParticleObject* gkScene::createParticleObject(const gkHashedString& name)
 }
 
 
-bool gkScene::_replaceObjectInScene(gkGameObject* gobj, gkScene* osc, gkScene* nsc)
+bool gkScene::_replaceObjectInScene(gkGameObject* gobj)
 {
-	GK_ASSERT(gobj && gobj->getOwner() == osc && gobj->getOwner() != nsc);
+	GK_ASSERT(gobj && gobj->getOwner() != this);
 
-	if (nsc->getObject(gobj->getName()) != 0)
+	if (getObject(gobj->getName()) != 0)
 	{
 		gkLogMessage("Scene: Another object by the name "
-		             << gobj->getName() << " exists in scene " << nsc->getName() << ". Cannot replace!");
+		             << gobj->getName() << " exists in scene " << getName() << ". Cannot replace!");
 		return false;
 	}
 
 
-	osc->_eraseObject(gobj);
+	gobj->getOwner()->_eraseObject(gobj);
 
 
-	gobj->setOwner(nsc);
+	gobj->setOwner(this);
 	gobj->setActiveLayer(true);
 	gobj->setLayer(m_layers);
 
 
-	nsc->m_objects.insert(gobj->getName(), gobj);
+	m_objects.insert(gobj->getName(), gobj);
 
-	if (nsc->isInstanced())
+	if (isInstanced())
 		gobj->createInstance();
 
 	return true;
@@ -450,7 +450,7 @@ void gkScene::addObject(gkGameObject* gobj)
 	{
 		if (gobj->getOwner() != 0)
 		{
-			if (!_replaceObjectInScene(gobj, gobj->getOwner(), this))
+			if (!_replaceObjectInScene(gobj))
 				return;
 		}
 		else
