@@ -91,36 +91,6 @@ void gkSceneManager::copyObjects(gkScene* fromScene, gkScene* toScene, int excep
 		}
 	}
 
-
-
-	// Copy also the logic bricks
-	if (gkLogicManager* lptr = fromScene->getLogicBrickManager())
-	{
-		gkLogicManager::Links& lnks = lptr->getLinks();
-
-		if (!lnks.empty())
-		{
-			gkLogicManager::LinkIterator iter(lnks);
-
-			while (iter.hasMoreElements())
-			{
-				gkLogicLink* lnk = iter.getNext();
-				gkGameObject* src = lnk->getObject();
-
-				if (src)
-				{
-					gkGameObject *dst = toScene->getObject(src->getName());
-					if (dst)
-					{
-						lnk->cloneToScene(dst, toScene);
-					}
-				}
-			}
-		}
-	}
-
-
-
 	gkGroupManager& groups = gkGroupManager::getSingleton();
 
 	gkGroupManager::Groups::Iterator giter = groups.getAttachedGroupIterator(fromScene);

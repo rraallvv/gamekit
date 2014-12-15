@@ -460,6 +460,25 @@ void gkScene::addObject(gkGameObject* gobj)
 		}
 	}
 
+
+	// Copy also the logic bricks
+
+	gkLogicLink *lnk = gobj->getLogicBricks();
+
+	if (lnk)
+	{
+		gkGameObject* src = lnk->getObject();
+
+		if (src)
+		{
+			gkGameObject *dst = getObject(src->getName());
+			if (dst)
+			{
+				lnk->cloneToScene(dst, this);
+			}
+		}
+
+	}
 }
 
 
